@@ -15,6 +15,19 @@ class node:
         print("'" + self.key + "' : '" + self.value + "'")
 
 
+
+# Notes about hashTable
+# As with all hashtables, hashTable loses efficiency rapidly once we approach full.
+# hashTable utilizes linear probing
+# This decision was made such that we avoid even more spatial inefficiency with a quadratic scheme
+# Prior implementation of quadratic scheme resulted in unresolvable collisions at roughly 75% ~ 90% full table
+# Also worth noting: hashTable is a fixed size and runs off of a list initialized to that size with None values
+# This is not the most spatially efficient, but is rather convenient. Besides, if you're really dealing with
+# a lot of values, you'd be better off with a hashmapped trie. This datastructure is designed for fixed convenience,
+# pure and simple - it also reliably performs until 100% load.
+
+
+
 class hashTable:
     # bucket is the container for all nodes
     bucket = []
@@ -30,25 +43,28 @@ class hashTable:
 
     # takes in size
     def __init__(self, size):
+        self.keys = set([])
         self.size = size
         self.bucket = [None] * size
+        self.__loadCalc();
 
     #we recalculate load on every operation
     #this function gets called at set operations and delete operations
     def __loadCalc(self):
         if (self.size == 0):
-            __loadFactor = 0
+            self.__loadFactor = 0
         else:
-            self.__load = self.__loadSum/self.size
+            self.__loadFactor = self.__loadSum/self.size
 
     # returns value associated with key
     def get(self, k):
+        k = str(k);
         if (k in self.keys):
-            i = 1
-            hashed = hash(len(k)) % 1
+            i = 0
+            hashed = (hash(k) + i) % self.size
             while(self.bucket[hashed] != None):
                 if(self.bucket[hashed].key != k):
-                    hashed = hash(len(k)) % i
+                    hashed = (hash(k) + i) % self.size
                     i += 1
                 else:
                     return self.bucket[hashed].value
@@ -60,24 +76,24 @@ class hashTable:
     # we use linear probing for collision resolution
     def set(self, k, v):
         k = str(k);
-        if (self.__loadFactor == 1):
-            return False
-        elif (k in self.keys):
-            i = 1
-            hashed = hash(len(k)) % 1
+        if (k in self.keys):
+            i = 0
+            hashed = (hash(k) + i) % self.size
             while(self.bucket[hashed] != None):
                 if(self.bucket[hashed].key != k):
-                    hashed = hash(len(k)) % i
+                    hashed = (hash(k) + i) % self.size
                     i += 1
                 else:
                     self.bucket[hashed].value = v
                     return True
+        elif (self.__loadFactor == 1.0):
+            return False
         else:
             newNode = node(k, v)
-            i = 1;
-            hashed = hash(len(k)) % i;
+            i = 0;
+            hashed = (hash(k) + i) % self.size;
             while(self.bucket[hashed] != None):
-                hashed = hash(len(k)) % i
+                hashed = (hash(k) + i) % self.size
                 i += 1
             self.bucket[hashed] = newNode
             self.keys.add(k)
@@ -88,12 +104,13 @@ class hashTable:
 
     # deletes value at given key. returns value.
     def delete(self, k):
+        k = str(k);
         if (k in self.keys):
-            i = 1
-            hashed = hash(len(k)) % 1
+            i = 0
+            hashed = (hash(k) + i) % self.size
             while(self.bucket[hashed] != None):
                 if(self.bucket[hashed].key != k):
-                    hashed = hash(len(k)) % i
+                    hashed = (hash(k) + i) % self.size
                     i += 1
                 else:
                     tmp = self.bucket[hashed].value
@@ -108,4 +125,4 @@ class hashTable:
 
     #returns load
     def load(self):
-        return self.__load
+        return self.__loadFactor
