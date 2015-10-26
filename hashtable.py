@@ -24,7 +24,7 @@ class node:
 # Also worth noting: hashTable is a fixed size and runs off of a list initialized to that size with None values
 # This is not the most spatially efficient, but is rather convenient. Besides, if you're really dealing with
 # a lot of values, you'd be better off with a hashmapped trie. This datastructure is designed for fixed convenience,
-# pure and simple - it also reliably performs until 100% load.
+# pure and simple - it also reliably performs until 100% load factor.
 
 
 
